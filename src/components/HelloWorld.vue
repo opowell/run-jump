@@ -17,14 +17,18 @@ const playerWidth = 30
 const playerLeft = 40
 const blockWidth = ref(20)
 const scores = ref([])
-let scoresStored = window.localStorage.getItem('scores')
-if (scoresStored) {
-  scoresStored = JSON.parse(scoresStored) 
+const scoresStoredString = window.localStorage.getItem('scores')
+let scoresStored: any[]
+if (scoresStoredString) {
+  scoresStored = JSON.parse(scoresStoredString) 
 } else
   scoresStored = []
-console.log(scoresStored)
-scoresStored.sort((a, b) => b.score - a.score)
+scoresStored.sort((a: { score: number; }, b: { score: number; }) => b.score - a.score)
 scores.value.push(...scoresStored)
+const gameRef = ref(null)
+const currentScore = ref()
+let insertIndex: number
+
 const playerStyle = computed(() => {
   return {
     bottom: playerPosition.value + 'px',
@@ -35,8 +39,40 @@ const playerStyle = computed(() => {
 const showNameEntry = computed(() => {
   return playerDead.value || playerName.value === ''
 })
-const gameRef = ref(null)
-const currentScore = ref()
+const computedScores = computed(() => {
+  return scores.value.map((x: { name: any; score: any; time: string }) => {
+    console.log(x)
+    return {
+      name: x.name,
+      score: x.score,
+      time: new Date(x.time),
+      current: currentScore.value && new Date(x.time).getTime() === currentScore.value.time.getTime()
+    }
+  })
+})
+
+function endGame() {
+  currentScore.value = {
+    name: playerName.value,
+    score: score.value,
+    time: new Date()
+  }
+  insertIndex = -1
+  for (let i = 0; i < scores.value.length; i++) {
+    if (scores.value[i].score < currentScore.value.score) {
+      insertIndex = i
+    }
+  }
+  if (insertIndex !== -1) {
+    scores.value.splice(insertIndex, 0, currentScore.value)
+  } else {
+    insertIndex = scores.value.push(currentScore.value) - 1
+  }
+  window.localStorage.setItem('scores', JSON.stringify(scores.value))
+  playerName.value = ''
+  clearInterval(gameLoopInterval)
+}
+
 function startGame() {
   if (playerName.value === '') return
   readyToStart.value = false
@@ -51,15 +87,7 @@ function startGame() {
   gameRef.value.focus()
   gameLoopInterval = setInterval(() => {
     if (playerDead.value) {
-      currentScore.value = {
-        name: playerName.value,
-        score: score.value
-      }
-      scores.value.push(currentScore.value)
-      scores.value.sort((a, b) => b.score - a.score)
-      window.localStorage.setItem('scores', JSON.stringify(scores.value))
-      playerName.value = ''
-      clearInterval(gameLoopInterval)
+      endGame()
       return
     }
     score.value = score.value + level.value
@@ -78,7 +106,7 @@ function startGame() {
     for (let i = 0; i < blocks.value.length; i++) {
       blocks.value[i] = blocks.value[i] - (7 + 2*level.value)
     }
-    blocks.value = blocks.value.filter(x => x >= -20)
+    blocks.value = blocks.value.filter((x: number) => x >= -20)
     if (addBlockDelay.value > 0) {
       addBlockDelay.value = addBlockDelay.value - (1 + level.value/3)
     }
@@ -111,13 +139,15 @@ function jump() {
   <div ref="gameRef" class="game" @keydown.space="handleSpace" tabindex="0">
     <div v-if="showNameEntry" class="enter-name">
       <div class="scores">
-        <div class="scores-list-entry" v-for="(s, i) in scores" :key="i" :style="{ highlight: s === currentScore }">
+        <div class="scores-list-entry" v-for="(s, i) in computedScores" :key="i" :class="{ highlight: s.current }">
           {{ i+1 }}. {{ s.score }} {{ s.name }}
         </div>
       </div>
       <br>
       <div>Type your name and press Enter:</div>
       <input type="text" v-model="playerName" @keydown.enter="startGame">
+      <br>
+      <br>
     </div>
     <div v-if="!showNameEntry">
       <div>{{ playerName }}</div>
