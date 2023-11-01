@@ -1,37 +1,82 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-const count = ref(0)
-setInterval(() => {
-  count.value = count.value + 1
-  console.log(playerPosition.value, playerJumpSpeed.value)
-  if (playerPosition.value > 5) {
-    playerJumpSpeed.value = playerJumpSpeed.value - 3
-  }
-  playerPosition.value = Math.max(playerPosition.value + playerJumpSpeed.value, 5)
-  if (playerPosition.value === 5) {
-    playerJumpSpeed.value = 0
-  }
-}, 100)
+const score = ref(0)
+let gameLoopInterval: number | undefined
 
+const playerDead = ref(true)
+const addBlockDelay = ref(0)
 const playerPosition = ref(5)
 const playerJumpSpeed = ref(0)
-const blocks = ref([200, 450])
+const blocks = ref([550, 800])
+const level = ref(1)
+const nextLevelCounter = ref(100)
 const playerStyle = computed(() => {
   return {
     bottom: playerPosition.value + 'px'
   }
 })
+function startGame() {
+  score.value = 0
+  level.value = 1
+  nextLevelCounter.value = 100
+  blocks.value = [550, 800]
+  addBlockDelay.value = 30
+  playerPosition.value = 5
+  playerJumpSpeed.value = 0
+  playerDead.value = false
+  gameLoopInterval = setInterval(() => {
+    score.value = score.value + level.value
+    nextLevelCounter.value = nextLevelCounter.value - 1
+    if (nextLevelCounter.value === 0) {
+      level.value = level.value + 1
+      nextLevelCounter.value = 100
+    }
+    if (playerPosition.value > 5) {
+      playerJumpSpeed.value = playerJumpSpeed.value - 5
+    }
+    playerPosition.value = Math.max(playerPosition.value + playerJumpSpeed.value, 5)
+    if (playerPosition.value === 5) {
+      playerJumpSpeed.value = 0
+    }
+    for (let i = 0; i < blocks.value.length; i++) {
+      blocks.value[i] = blocks.value[i] - (7 + 2*level.value)
+    }
+    blocks.value = blocks.value.filter(x => x >= -20)
+    if (addBlockDelay.value > 0) {
+      addBlockDelay.value = addBlockDelay.value - (1 + level.value/3)
+    }
+    if (addBlockDelay.value <= 0) {
+      if (Math.random() > 0.7) {
+        blocks.value.push(1000)
+        addBlockDelay.value = 30
+      }
+    }
+    if (playerPosition.value < 20 && blocks.value[0] > 43 && blocks.value[0] <= 61) {
+      playerDead.value = true
+      clearInterval(gameLoopInterval)
+    }
+  }, 100)
+}
+function handleSpace() {
+  if (playerDead.value) {
+    startGame()
+  } else {
+    jump()
+  }
+}
 function jump() {
   if (playerPosition.value === 5) {
-    playerJumpSpeed.value = 15
+    playerJumpSpeed.value = 25
   }
 }
 </script>
 
 <template>
-  <div class="game" @keydown.space="jump" tabindex="0">
-    <div class="score">{{ count }}</div>
+  <div class="game" @keydown.space="handleSpace" tabindex="0">
+    <div class="stopped">Dead: {{ playerDead }}</div>
+    <div class="level">Level {{ level }}</div>
+    <div class="score">{{ score }}</div>
     <div class="board">
       <div class="character" :style="playerStyle" />
       <div class="ground" />
@@ -43,23 +88,22 @@ function jump() {
 
 <style scoped>
 .block {
-  height: 30px;
-  width: 30px;
+  height: 20px;
+  width: 20px;
   background-color: rgb(149, 6, 6);
   position: absolute;
   bottom: 5px;
 }
 .score {
   color: yellow;
-  font-size: 36px;
-  margin-bottom: 10rem;
-  display: none;
+  margin-bottom: 2rem;
 }
 .character {
   width: 40px;
   height: 70px;
   background-color: green;
   position: absolute;
+  left: 20px;
 }
 .ground {
   height: 5px;
@@ -73,5 +117,6 @@ function jump() {
   height: 200px;
   width: 100%;
   position: relative;
+  overflow: hidden;
 }
 </style>
