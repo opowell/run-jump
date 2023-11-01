@@ -2,34 +2,19 @@
 import { computed, onMounted, ref } from 'vue'
 
 const score = ref(0)
-let gameLoopInterval: number | undefined
-
-const readyToStart = ref(true)
-const playerDead = ref(true)
 const addBlockDelay = ref(0)
-const playerPosition = ref(5)
 const playerJumpSpeed = ref(0)
-const playerName = ref('')
 const blocks = ref([550, 800])
 const level = ref(1)
 const nextLevelCounter = ref(100)
+const blockWidth = ref(20)
+let gameLoopInterval: number | undefined
+
+const gameRef = ref(null)
+
+const playerPosition = ref(5)
 const playerWidth = 30
 const playerLeft = 40
-const blockWidth = ref(20)
-const scores = ref([])
-const scoresStoredString = window.localStorage.getItem('scores')
-let scoresStored: any[]
-if (scoresStoredString) {
-  scoresStored = JSON.parse(scoresStoredString) 
-} else
-  scoresStored = []
-scoresStored.sort((a: { score: number; }, b: { score: number; }) => b.score - a.score)
-scores.value.push(...scoresStored)
-const gameRef = ref(null)
-const nameInputRef = ref(null)
-const currentScore = ref()
-let insertIndex: number
-
 const playerStyle = computed(() => {
   return {
     bottom: playerPosition.value + 'px',
@@ -37,11 +22,24 @@ const playerStyle = computed(() => {
     width: playerWidth + 'px'
   }
 })
+
+const playerDead = ref(true)
+const playerName = ref('')
 const showNameEntry = computed(() => {
   return playerDead.value || playerName.value === ''
 })
+
+const scoresStoredString = window.localStorage.getItem('scores')
+let scoresStored: any[]
+if (scoresStoredString) {
+  scoresStored = JSON.parse(scoresStoredString) 
+} else
+  scoresStored = []
+scoresStored.sort((a: { score: number; }, b: { score: number; }) => b.score - a.score)
+const scores = ref([...scoresStored])
+const currentScore = ref()
 const computedScores = computed(() => {
-  return scores.value.map((x: { name: any; score: any; time: string }) => {
+  const all = scores.value.map((x: { name: any; score: any; time: string }) => {
     return {
       name: x.name,
       score: x.score,
@@ -49,7 +47,11 @@ const computedScores = computed(() => {
       current: currentScore.value && new Date(x.time).getTime() === currentScore.value.time.getTime()
     }
   })
+  const currentIndex = all.findIndex(x => x.current)
+  const start = Math.max(currentIndex - 2, 0)
+  return all.slice(start, start + 5)
 })
+const nameInputRef = ref(null)
 onMounted(() => {
   nameInputRef?.value.focus()
 })
@@ -60,14 +62,13 @@ function endGame() {
     score: score.value,
     time: new Date()
   }
-  insertIndex = -1
+  let insertIndex: number = -1
   for (let i = 0; i < scores.value.length; i++) {
     if (scores.value[i].score < currentScore.value.score) {
       insertIndex = i
       break
     }
   }
-  console.log('insert', insertIndex)
   if (insertIndex !== -1) {
     scores.value.splice(insertIndex, 0, currentScore.value)
   } else {
@@ -79,6 +80,7 @@ function endGame() {
   clearInterval(gameLoopInterval)
 }
 
+const readyToStart = ref(true)
 function startGame() {
   if (playerName.value === '') return
   readyToStart.value = false
@@ -143,17 +145,18 @@ function jump() {
 
 <template>
   <div ref="gameRef" class="game" @keydown.space="handleSpace" tabindex="0">
+    <div>Run-Jump</div>
     <div v-if="showNameEntry" class="enter-name">
+      <div class="title">Run-Jump</div>
       <div class="scores">
         <div class="scores-list-entry" v-for="(s, i) in computedScores" :key="i" :class="{ highlight: s.current }">
           {{ i+1 }}. {{ s.score }} {{ s.name }}
         </div>
       </div>
-      <br>
-      <div>Type your name and press Enter:</div>
-      <input ref="nameInputRef" type="text" v-model="playerName" @keydown.enter="startGame">
-      <br>
-      <br>
+      <div>
+        <div>Type your name and press Enter:</div>
+        <input ref="nameInputRef" type="text" v-model="playerName" @keydown.enter="startGame">
+      </div>
     </div>
     <div v-if="!showNameEntry">
       <div>{{ playerName }}</div>
@@ -165,7 +168,6 @@ function jump() {
       <div class="ground" />
       <div class="block" v-for="(block, index) in blocks" :key="index" :style="{ left: block + 'px', width: blockWidth + 'px' }"/> 
     </div>
-    <h1>Run-Jump</h1>
   </div>
 </template>
 
@@ -173,6 +175,7 @@ function jump() {
 .scores {
   display: flex;
   flex-direction: column;
+  color: #AAA;
 }
 .block {
   height: 20px;
@@ -208,5 +211,17 @@ function jump() {
 }
 .highlight {
   color: yellow;
+}
+.enter-name {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  background-color: #2f2f2f;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 </style>
