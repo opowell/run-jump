@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const score = ref(0)
 let gameLoopInterval: number | undefined
@@ -26,6 +26,7 @@ if (scoresStoredString) {
 scoresStored.sort((a: { score: number; }, b: { score: number; }) => b.score - a.score)
 scores.value.push(...scoresStored)
 const gameRef = ref(null)
+const nameInputRef = ref(null)
 const currentScore = ref()
 let insertIndex: number
 
@@ -41,7 +42,6 @@ const showNameEntry = computed(() => {
 })
 const computedScores = computed(() => {
   return scores.value.map((x: { name: any; score: any; time: string }) => {
-    console.log(x)
     return {
       name: x.name,
       score: x.score,
@@ -49,6 +49,9 @@ const computedScores = computed(() => {
       current: currentScore.value && new Date(x.time).getTime() === currentScore.value.time.getTime()
     }
   })
+})
+onMounted(() => {
+  nameInputRef?.value.focus()
 })
 
 function endGame() {
@@ -61,15 +64,18 @@ function endGame() {
   for (let i = 0; i < scores.value.length; i++) {
     if (scores.value[i].score < currentScore.value.score) {
       insertIndex = i
+      break
     }
   }
+  console.log('insert', insertIndex)
   if (insertIndex !== -1) {
     scores.value.splice(insertIndex, 0, currentScore.value)
   } else {
-    insertIndex = scores.value.push(currentScore.value) - 1
+    scores.value.push(currentScore.value) - 1
   }
   window.localStorage.setItem('scores', JSON.stringify(scores.value))
   playerName.value = ''
+  nameInputRef?.value.focus()
   clearInterval(gameLoopInterval)
 }
 
@@ -84,7 +90,7 @@ function startGame() {
   playerPosition.value = 5
   playerJumpSpeed.value = 0
   playerDead.value = false
-  gameRef.value.focus()
+  gameRef?.value.focus()
   gameLoopInterval = setInterval(() => {
     if (playerDead.value) {
       endGame()
@@ -145,7 +151,7 @@ function jump() {
       </div>
       <br>
       <div>Type your name and press Enter:</div>
-      <input type="text" v-model="playerName" @keydown.enter="startGame">
+      <input ref="nameInputRef" type="text" v-model="playerName" @keydown.enter="startGame">
       <br>
       <br>
     </div>
