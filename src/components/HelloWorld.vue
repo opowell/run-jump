@@ -158,8 +158,8 @@ function jump() {
         <input ref="nameInputRef" type="text" v-model="playerName" @keydown.enter="startGame">
       </div>
     </div>
-    <div v-if="!showNameEntry">
-      <div>{{ playerName }}</div>
+    <div>
+      <div>&nbsp;{{ playerName }}&nbsp;</div>
       <div class="level">Level {{ level }}</div>
       <div class="score">{{ score }}</div>
     </div>
