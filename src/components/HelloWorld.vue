@@ -39,8 +39,11 @@ scoresStored.sort((a: { score: number; }, b: { score: number; }) => b.score - a.
 const scores = ref([...scoresStored])
 const currentScore = ref()
 const computedScores = computed(() => {
+  let index = 0
   const all = scores.value.map((x: { name: any; score: any; time: string }) => {
+    index = index + 1
     return {
+      index,
       name: x.name,
       score: x.score,
       time: new Date(x.time),
@@ -150,7 +153,7 @@ function jump() {
       <div class="title">Run-Jump</div>
       <div class="scores">
         <div class="scores-list-entry" v-for="(s, i) in computedScores" :key="i" :class="{ highlight: s.current }">
-          {{ i+1 }}. {{ s.score }} {{ s.name }}
+          {{ s.index }}. {{ s.score }} {{ s.name }}
         </div>
       </div>
       <div>
