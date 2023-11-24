@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from 'vue'
 const score = ref(0)
 const addBlockDelay = ref(0)
 const playerJumpSpeed = ref(0)
+const lemmingJumpSpeed = ref(0)
 const blocks = ref([550, 800])
 const level = ref(1)
 const nextLevelCounter = ref(100)
@@ -12,14 +13,27 @@ let gameLoopInterval: number | undefined
 
 const gameRef = ref(null)
 
-const playerPosition = ref(5)
+const playerBasePosition = 5 //25
+const lemmingBasePosition = 5 //57
+const playerPosition = ref(playerBasePosition)
+const lemmingPosition = ref(lemmingBasePosition)
 const playerWidth = 30
-const playerLeft = 40
+const lemmingWidth = 10
+const playerLeft = 140
+const lemmingHeadstart = 200
+const lemmingLeft = playerLeft + lemmingHeadstart
 const playerStyle = computed(() => {
   return {
     bottom: playerPosition.value + 'px',
     left: playerLeft + 'px',
     width: playerWidth + 'px'
+  }
+})
+const lemmingStyle = computed(() => {
+  return {
+    bottom: lemmingPosition.value + 'px',
+    left: lemmingLeft + 'px',
+    width: lemmingWidth + 'px'
   }
 })
 
@@ -54,12 +68,19 @@ const computedScores = computed(() => {
   const start = Math.max(currentIndex - 2, 0)
   return all.slice(start, start + 5)
 })
+
+const lemmingActiveBlock = computed(() => {
+  return blocks.value.find(b => b > lemmingLeft && b - lemmingLeft < 60)
+})
+
 const nameInputRef = ref(null)
 onMounted(() => {
   nameInputRef?.value.focus()
 })
 
 function endGame() {
+  const music = document.getElementById("music");
+  music.pause()
   currentScore.value = {
     name: playerName.value,
     score: score.value,
@@ -86,13 +107,16 @@ function endGame() {
 const readyToStart = ref(true)
 function startGame() {
   if (playerName.value === '') return
+  const music = document.getElementById("music")
+  music.currentTime = 0
+  music.play()
   readyToStart.value = false
   score.value = 0
   level.value = 1
   nextLevelCounter.value = 100
   blocks.value = [550, 800]
   addBlockDelay.value = 5
-  playerPosition.value = 5
+  playerPosition.value = playerBasePosition
   playerJumpSpeed.value = 0
   playerDead.value = false
   gameRef?.value.focus()
@@ -107,11 +131,11 @@ function startGame() {
       level.value = level.value + 1
       nextLevelCounter.value = 100
     }
-    if (playerPosition.value > 5) {
+    if (playerPosition.value > playerBasePosition) {
       playerJumpSpeed.value = playerJumpSpeed.value - 5
     }
-    playerPosition.value = Math.max(playerPosition.value + playerJumpSpeed.value, 5)
-    if (playerPosition.value === 5) {
+    playerPosition.value = Math.max(playerPosition.value + playerJumpSpeed.value, playerBasePosition)
+    if (playerPosition.value === playerBasePosition) {
       playerJumpSpeed.value = 0
     }
     for (let i = 0; i < blocks.value.length; i++) {
@@ -130,6 +154,21 @@ function startGame() {
     if (playerPosition.value < 20 && blocks.value[0] > playerLeft && blocks.value[0] <= playerLeft + playerWidth) {
       playerDead.value = true
     }
+    if (lemmingPosition.value > lemmingBasePosition) {
+        lemmingJumpSpeed.value = lemmingJumpSpeed.value - 5
+      }
+    if (lemmingActiveBlock && lemmingLeft - lemmingActiveBlock.value < 20 && lemmingPosition.value === lemmingBasePosition) {
+      if (lemmingPosition.value === lemmingBasePosition) {
+        const lemmings = document.getElementById("lemmings")
+        lemmings.currentTime = 0
+        lemmings.play()
+        lemmingJumpSpeed.value = 22
+      }
+    }
+    lemmingPosition.value = Math.max(lemmingPosition.value + lemmingJumpSpeed.value, lemmingBasePosition)
+    if (lemmingPosition.value === lemmingBasePosition) {
+      lemmingJumpSpeed.value = 0
+    }
   }, 50)
 }
 function handleSpace() {
@@ -140,14 +179,26 @@ function handleSpace() {
   }
 }
 function jump() {
-  if (playerPosition.value === 5) {
+  if (playerPosition.value === playerBasePosition) {
     playerJumpSpeed.value = 22
+    const grizz = document.getElementById("grizz")
+    grizz.currentTime = 0
+    grizz.play()
   }
 }
 </script>
 
 <template>
   <div ref="gameRef" class="game" @keydown.space="handleSpace" tabindex="0">
+    <audio loop id="music">
+      <source src="./music2.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="grizz">
+      <source src="./grizz.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="lemmings">
+      <source src="./lemmings.mp3" type="audio/mpeg">
+    </audio>
     <div>Run-Jump</div>
     <div v-if="showNameEntry" class="enter-name">
       <div class="title">Run-Jump</div>
@@ -168,6 +219,7 @@ function jump() {
     </div>
     <div class="board">
       <div class="character" :style="playerStyle" />
+      <div class="lemming" :style="lemmingStyle" />
       <div class="ground" />
       <div class="block" v-for="(block, index) in blocks" :key="index" :style="{ left: block + 'px', width: blockWidth + 'px' }"/> 
     </div>
@@ -182,7 +234,7 @@ function jump() {
 }
 .block {
   height: 20px;
-  background-color: rgb(149, 6, 6);
+  background-color: rgb(96, 96, 96);
   position: absolute;
   bottom: 5px;
 }
@@ -192,19 +244,26 @@ function jump() {
 }
 .character {
   height: 50px;
-  background-color: green;
+  background-color: rgb(97, 48, 0);
+  position: absolute;
+}
+.lemming {
+  height: 15px;
+  background-color: rgb(20, 190, 202);
   position: absolute;
 }
 .ground {
   height: 5px;
+  /* width: 110%; */
   width: 100%;
   background-color: lightgray;
   bottom: 0;
   position: absolute;
+  /* transform: rotate(-10deg) translateY(-80px); */
 }
 .board {
   background-color: black;
-  height: 200px;
+  height: 300px;
   width: 100%;
   position: relative;
   overflow: hidden;
