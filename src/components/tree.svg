@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg3631"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="simple christmass tree silhouette.svg">
+  <defs
+     id="defs3625">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath18">
+      <path
+         d="M 0,600.949 H 847.559 V 0 H 0 Z"
+         id="path16"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <linearGradient
+       id="a"
+       x1="104.73"
+       x2="494.51999"
+       y1="335.72"
+       y2="895.84003"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         stop-color="#e00"
+         offset="0"
+         id="stop2" />
+      <stop
+         stop-color="#9a0000"
+         offset="1"
+         id="stop4" />
+    </linearGradient>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath320">
+      <path
+         d="M 875.158,1588.93 H 1748.09 V 734.859 H 875.158 Z"
+         id="path318"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath296">
+      <path
+         d="M 937.531,1581.32 H 1799.45 V 699.325 H 937.531 Z"
+         id="path294"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath260">
+      <path
+         d="m 1168.49,1807.23 h 190.99 v -82.16 h -190.99 z"
+         id="path258"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.37007452"
+     inkscape:cx="500.65356"
+     inkscape:cy="56.040509"
+     inkscape:document-units="mm"
+     inkscape:current-layer="g11993"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:snap-global="true">
+    <sodipodi:guide
+       position="72.922013,252.88982"
+       orientation="0,1"
+       id="guide4178"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="99.099147,43.94019"
+       orientation="0,1"
+       id="guide4180"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata3628">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g11993"
+       transform="translate(0.01320793,-14.655723)">
+      <g
+         id="g13812"
+         transform="translate(3.1167671,1.5852996)" />
+      <g
+         id="g13812-5"
+         transform="translate(-482.23124,192.21062)" />
+      <g
+         id="g13812-4"
+         transform="translate(-485.09102,302.31232)" />
+      <g
+         transform="matrix(3.1437054,0,0,3.1437054,-151.10417,-307.99345)"
+         id="g13735-2"
+         style="fill:#38761d;fill-opacity:1">
+        <path
+           id="path83-9"
+           d="m 65.332245,143.756 16.12926,-20.58326 16.12927,20.58326 z"
+           style="fill:#38761d;fill-opacity:1;stroke-width:0.26458332"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path85-4"
+           d="m 61.022185,155.99033 20.43747,-24.69171 20.437475,24.69171 z"
+           style="fill:#38761d;fill-opacity:1;stroke-width:0.26458332"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path87-7"
+           d="m 59.424095,167.94156 22.03741,-28.51679 22.037405,28.51679 z"
+           style="fill:#38761d;fill-opacity:1;stroke-width:0.26458332"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path89-3"
+           d="m 75.762115,160.9936 h 11.40011 v 15.57496 h -11.40011 z"
+           style="fill:#38761d;fill-opacity:1;stroke-width:0.26458332"
+           inkscape:connector-curvature="0" />
+      </g>
+    </g>
+  </g>
+</svg>

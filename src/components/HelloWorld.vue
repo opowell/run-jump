@@ -3,9 +3,11 @@ import { computed, onMounted, ref } from 'vue'
 
 const score = ref(0)
 const addBlockDelay = ref(0)
+const addTreeDelay = ref(0)
 const playerJumpSpeed = ref(0)
 const lemmingJumpSpeed = ref(0)
 const blocks = ref([550, 800])
+const trees = ref([300, 600, 900])
 const level = ref(1)
 const nextLevelCounter = ref(100)
 const blockWidth = ref(20)
@@ -115,7 +117,9 @@ function startGame() {
   level.value = 1
   nextLevelCounter.value = 100
   blocks.value = [550, 800]
+  trees.value = [300, 600, 900]
   addBlockDelay.value = 5
+  addTreeDelay.value = 80
   playerPosition.value = playerBasePosition
   playerJumpSpeed.value = 0
   playerDead.value = false
@@ -141,15 +145,26 @@ function startGame() {
     for (let i = 0; i < blocks.value.length; i++) {
       blocks.value[i] = blocks.value[i] - (7 + 2*level.value)
     }
+    for (let i = 0; i < trees.value.length; i++) {
+      trees.value[i] = trees.value[i] - 3
+    }
     blocks.value = blocks.value.filter((x: number) => x >= -20)
+    trees.value = trees.value.filter((x: number) => x >= -50)
     if (addBlockDelay.value > 0) {
       addBlockDelay.value = addBlockDelay.value - (1 + level.value/3)
+    }
+    if (addTreeDelay.value > 0) {
+      addTreeDelay.value = addTreeDelay.value - 1
     }
     if (addBlockDelay.value <= 0) {
       if (Math.random() > 0.7) {
         blocks.value.push(1000)
         addBlockDelay.value = 30
       }
+    }
+    if (addTreeDelay.value <= 0) {
+      trees.value.push(1100)
+      addTreeDelay.value = 80
     }
     if (playerPosition.value < 20 && blocks.value[0] > playerLeft && blocks.value[0] <= playerLeft + playerWidth) {
       playerDead.value = true
@@ -221,7 +236,9 @@ function jump() {
       <div class="character" :style="playerStyle" />
       <div class="lemming" :style="lemmingStyle" />
       <div class="ground" />
+      <div class="treeline" />
       <div class="block" v-for="(block, index) in blocks" :key="index" :style="{ left: block + 'px', width: blockWidth + 'px' }"/> 
+      <img src="./tree.svg" v-for="tree in trees" :key="tree" class="tree" :style="{ left: tree + 'px'}" />
     </div>
   </div>
 </template>
@@ -246,11 +263,18 @@ function jump() {
   height: 50px;
   background-color: rgb(97, 48, 0);
   position: absolute;
+  z-index: 2;
 }
 .lemming {
   height: 15px;
   background-color: rgb(20, 190, 202);
   position: absolute;
+  z-index: 2;
+}
+.tree {
+  bottom: 50px;
+  position: absolute;
+  width: 50px;
 }
 .ground {
   height: 5px;
@@ -258,6 +282,15 @@ function jump() {
   width: 100%;
   background-color: lightgray;
   bottom: 0;
+  position: absolute;
+  /* transform: rotate(-10deg) translateY(-80px); */
+}
+.treeline {
+  height: 2px;
+  /* width: 110%; */
+  width: 100%;
+  background-color: rgb(68, 41, 0);
+  bottom: 70px;
   position: absolute;
   /* transform: rotate(-10deg) translateY(-80px); */
 }
@@ -279,11 +312,12 @@ function jump() {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;
+  z-index: 3;
   background-color: #2f2f2f;
   padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 450px;
 }
 </style>
