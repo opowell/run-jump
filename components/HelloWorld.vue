@@ -205,7 +205,7 @@ function jump() {
 
 <template>
   <div ref="gameRef" class="game" @keydown.space="handleSpace" tabindex="0">
-    <audio loop id="music">
+    <!-- <audio loop id="music">
       <source src="./music2.mp3" type="audio/mpeg">
     </audio>
     <audio id="grizz">
@@ -213,7 +213,7 @@ function jump() {
     </audio>
     <audio id="lemmings">
       <source src="./lemmings.mp3" type="audio/mpeg">
-    </audio>
+    </audio> -->
     <div>Run-Jump</div>
     <div v-if="showNameEntry" class="enter-name">
       <div class="title">Run-Jump</div>
