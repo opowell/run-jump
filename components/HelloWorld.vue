@@ -48,7 +48,7 @@ const showNameEntry = computed(() => {
 const scoresStoredString = window.localStorage.getItem('scores')
 let scoresStored: any[]
 if (scoresStoredString) {
-  scoresStored = JSON.parse(scoresStoredString) 
+  scoresStored = JSON.parse(scoresStoredString)
 } else
   scoresStored = []
 scoresStored.sort((a: { score: number; }, b: { score: number; }) => b.score - a.score)
@@ -80,8 +80,12 @@ onMounted(() => {
   nameInputRef?.value.focus()
 })
 
+const music = new Audio('./assets/music.mp3')
+music.loop = true
+const grizz = new Audio('./assets/grizz.mp3')
+const lemmings = new Audio('./assets/lemmings.mp3')
+
 function endGame() {
-  const music = document.getElementById("music");
   music.pause()
   currentScore.value = {
     name: playerName.value,
@@ -109,7 +113,6 @@ function endGame() {
 const readyToStart = ref(true)
 function startGame() {
   if (playerName.value === '') return
-  const music = document.getElementById("music")
   music.currentTime = 0
   music.play()
   readyToStart.value = false
@@ -143,7 +146,7 @@ function startGame() {
       playerJumpSpeed.value = 0
     }
     for (let i = 0; i < blocks.value.length; i++) {
-      blocks.value[i] = blocks.value[i] - (7 + 2*level.value)
+      blocks.value[i] = blocks.value[i] - (7 + 2 * level.value)
     }
     for (let i = 0; i < trees.value.length; i++) {
       trees.value[i] = trees.value[i] - 3
@@ -151,7 +154,7 @@ function startGame() {
     blocks.value = blocks.value.filter((x: number) => x >= -20)
     trees.value = trees.value.filter((x: number) => x >= -50)
     if (addBlockDelay.value > 0) {
-      addBlockDelay.value = addBlockDelay.value - (1 + level.value/3)
+      addBlockDelay.value = addBlockDelay.value - (1 + level.value / 3)
     }
     if (addTreeDelay.value > 0) {
       addTreeDelay.value = addTreeDelay.value - 1
@@ -170,11 +173,10 @@ function startGame() {
       playerDead.value = true
     }
     if (lemmingPosition.value > lemmingBasePosition) {
-        lemmingJumpSpeed.value = lemmingJumpSpeed.value - 5
-      }
+      lemmingJumpSpeed.value = lemmingJumpSpeed.value - 5
+    }
     if (lemmingActiveBlock && lemmingLeft - lemmingActiveBlock.value < 20 && lemmingPosition.value === lemmingBasePosition) {
       if (lemmingPosition.value === lemmingBasePosition) {
-        const lemmings = document.getElementById("lemmings")
         lemmings.currentTime = 0
         lemmings.play()
         lemmingJumpSpeed.value = 22
@@ -196,7 +198,6 @@ function handleSpace() {
 function jump() {
   if (playerPosition.value === playerBasePosition) {
     playerJumpSpeed.value = 22
-    const grizz = document.getElementById("grizz")
     grizz.currentTime = 0
     grizz.play()
   }
@@ -205,15 +206,6 @@ function jump() {
 
 <template>
   <div ref="gameRef" class="game" @keydown.space="handleSpace" tabindex="0">
-    <!-- <audio loop id="music">
-      <source src="./music2.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="grizz">
-      <source src="./grizz.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="lemmings">
-      <source src="./lemmings.mp3" type="audio/mpeg">
-    </audio> -->
     <div>Run-Jump</div>
     <div v-if="showNameEntry" class="enter-name">
       <div class="title">Run-Jump</div>
@@ -237,8 +229,9 @@ function jump() {
       <div class="lemming" :style="lemmingStyle" />
       <div class="ground" />
       <div class="treeline" />
-      <div class="block" v-for="(block, index) in blocks" :key="index" :style="{ left: block + 'px', width: blockWidth + 'px' }"/> 
-      <img src="./tree.svg" v-for="tree in trees" :key="tree" class="tree" :style="{ left: tree + 'px'}" />
+      <div class="block" v-for="(block, index) in blocks" :key="index"
+        :style="{ left: block + 'px', width: blockWidth + 'px' }" />
+      <img src="../assets/tree.svg" v-for="tree in trees" :key="tree" class="tree" :style="{ left: tree + 'px' }" />
     </div>
   </div>
 </template>
@@ -249,33 +242,39 @@ function jump() {
   flex-direction: column;
   color: #AAA;
 }
+
 .block {
   height: 20px;
   background-color: rgb(96, 96, 96);
   position: absolute;
   bottom: 5px;
 }
+
 .score {
   color: yellow;
   margin-bottom: 2rem;
 }
+
 .character {
   height: 50px;
   background-color: rgb(97, 48, 0);
   position: absolute;
   z-index: 2;
 }
+
 .lemming {
   height: 15px;
   background-color: rgb(20, 190, 202);
   position: absolute;
   z-index: 2;
 }
+
 .tree {
   bottom: 50px;
   position: absolute;
   width: 50px;
 }
+
 .ground {
   height: 5px;
   /* width: 110%; */
@@ -285,6 +284,7 @@ function jump() {
   position: absolute;
   /* transform: rotate(-10deg) translateY(-80px); */
 }
+
 .treeline {
   height: 2px;
   /* width: 110%; */
@@ -294,6 +294,7 @@ function jump() {
   position: absolute;
   /* transform: rotate(-10deg) translateY(-80px); */
 }
+
 .board {
   background-color: black;
   height: 300px;
@@ -301,12 +302,15 @@ function jump() {
   position: relative;
   overflow: hidden;
 }
+
 .game:focus {
   outline: none;
 }
+
 .highlight {
   color: yellow;
 }
+
 .enter-name {
   position: fixed;
   top: 50%;
