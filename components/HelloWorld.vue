@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 
+const INITIAL_ADD_TREE_DELAY = 60
 const score = ref(0)
 const addBlockDelay = ref(0)
 const addTreeDelay = ref(0)
 const playerJumpSpeed = ref(0)
 const lemmingJumpSpeed = ref(0)
 const blocks = ref([550, 800])
-const trees = ref([300, 600, 900])
+const trees = ref(generateInitialTrees())
 const level = ref(1)
 const nextLevelCounter = ref(100)
 const blockWidth = ref(20)
@@ -118,6 +119,28 @@ function endGame() {
   clearInterval(gameLoopInterval)
 }
 
+function generateTree(x: number): Tree {
+  return {
+    x: Math.random() * 100 - 50 + x,
+    y: Math.random() * 30 + 15
+  }
+}
+
+function generateInitialTrees(): Tree[] {
+  return [
+    generateTree(300),
+    generateTree(450),
+    generateTree(600),
+    generateTree(750),
+    generateTree(900)
+  ]
+}
+
+interface Tree {
+  x: number
+  y: number
+}
+
 const readyToStart = ref(true)
 function startGame() {
   if (playerName.value === '') return
@@ -128,9 +151,9 @@ function startGame() {
   level.value = 1
   nextLevelCounter.value = 100
   blocks.value = [550, 800]
-  trees.value = [300, 600, 900]
+  trees.value = generateInitialTrees()
   addBlockDelay.value = 5
-  addTreeDelay.value = 80
+  addTreeDelay.value = INITIAL_ADD_TREE_DELAY
   playerPosition.value = playerBasePosition
   playerJumpSpeed.value = 0
   playerDead.value = false
@@ -157,10 +180,10 @@ function startGame() {
       blocks.value[i] = blocks.value[i] - (7 + 2 * level.value)
     }
     for (let i = 0; i < trees.value.length; i++) {
-      trees.value[i] = trees.value[i] - 3
+      trees.value[i].x = trees.value[i].x - 3
     }
     blocks.value = blocks.value.filter((x: number) => x >= -20)
-    trees.value = trees.value.filter((x: number) => x >= -50)
+    trees.value = trees.value.filter((tree: Tree) => tree.x >= -50)
     if (addBlockDelay.value > 0) {
       addBlockDelay.value = addBlockDelay.value - (1 + level.value / 3)
     }
@@ -174,8 +197,8 @@ function startGame() {
       }
     }
     if (addTreeDelay.value <= 0) {
-      trees.value.push(1100)
-      addTreeDelay.value = 80
+      trees.value.push(generateTree(1100))
+      addTreeDelay.value = INITIAL_ADD_TREE_DELAY
     }
     if (playerPosition.value < 20 && blocks.value[0] > playerLeft && blocks.value[0] <= playerLeft + playerWidth) {
       playerDead.value = true
@@ -239,7 +262,8 @@ function jump() {
       <div class="treeline" />
       <div class="block" v-for="(block, index) in blocks" :key="index"
         :style="{ left: block + 'px', width: blockWidth + 'px' }" />
-      <span v-html="treeSvg" v-for="tree in trees" :key="tree" class="tree" :style="{ left: tree + 'px' }" />
+      <span v-html="treeSvg" v-for="tree in trees" :key="tree" class="tree"
+        :style="{ left: tree.x + 'px', bottom: tree.y + 'px' }" />
     </div>
   </div>
 </template>
