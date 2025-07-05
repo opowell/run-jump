@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const score = ref(0)
 const addBlockDelay = ref(0)
@@ -76,6 +76,14 @@ const lemmingActiveBlock = computed(() => {
 })
 
 const nameInputRef = ref(null)
+
+function asyncToRef(callback) {
+
+  const val = ref();
+  watch(() => callback(), promise => promise.then(value => val.value = value), { immediate: true });  // TBD handle catch()...
+  return val;
+}
+const treeSvg = asyncToRef(() => import('../assets/tree.svg'))
 onMounted(() => {
   nameInputRef?.value.focus()
 })
@@ -231,7 +239,7 @@ function jump() {
       <div class="treeline" />
       <div class="block" v-for="(block, index) in blocks" :key="index"
         :style="{ left: block + 'px', width: blockWidth + 'px' }" />
-      <img src="../assets/tree.svg" v-for="tree in trees" :key="tree" class="tree" :style="{ left: tree + 'px' }" />
+      <span v-html="treeSvg" v-for="tree in trees" :key="tree" class="tree" :style="{ left: tree + 'px' }" />
     </div>
   </div>
 </template>

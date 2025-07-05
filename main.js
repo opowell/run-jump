@@ -7,7 +7,6 @@ const options = {
     const res = await fetch(url);
     if (!res.ok)
       throw Object.assign(new Error(res.statusText + ' ' + url), { res });
-    console.log(res)
     return {
       getContentData: (asBinary) => {
         return asBinary ? res.arrayBuffer() : res.text()
@@ -21,7 +20,7 @@ const options = {
   },
   handleModule: async (type, getContentData, path, options) => {
     switch (type) {
-      case '.svg': return 'data:image/svg+xml,' + await getContentData(false);
+      case '.svg': return getContentData(false);
     }
   },
   log(type, ...args) {
