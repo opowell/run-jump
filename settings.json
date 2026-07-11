@@ -1,0 +1,3 @@
+{
+  "sharedApps": ["vue-global", "vue3-sfc-loader"]
+}
