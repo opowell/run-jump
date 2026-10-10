@@ -4,10 +4,12 @@ import { computed, onMounted, ref } from 'vue'
 const score = ref(0)
 const addBlockDelay = ref(0)
 const addTreeDelay = ref(0)
+const addFrontTreeDelay = ref(0)
 const playerJumpSpeed = ref(0)
 const lemmingJumpSpeed = ref(0)
 const blocks = ref([550, 800])
 const trees = ref([300, 600, 900])
+const frontTrees = ref([200, 800])
 const level = ref(1)
 const nextLevelCounter = ref(100)
 const blockWidth = ref(20)
@@ -117,9 +119,10 @@ function startGame() {
   level.value = 1
   nextLevelCounter.value = 100
   blocks.value = [550, 800]
-  trees.value = [300, 600, 900]
+  trees.value = [200, 1000]
   addBlockDelay.value = 5
-  addTreeDelay.value = 80
+  addTreeDelay.value = 100
+  addFrontTreeDelay.value = 80
   playerPosition.value = playerBasePosition
   playerJumpSpeed.value = 0
   playerDead.value = false
@@ -146,15 +149,22 @@ function startGame() {
       blocks.value[i] = blocks.value[i] - (7 + 2*level.value)
     }
     for (let i = 0; i < trees.value.length; i++) {
-      trees.value[i] = trees.value[i] - 3
+      trees.value[i] = trees.value[i] - (level.value + 1)/2
+    }
+    for (let i = 0; i < frontTrees.value.length; i++) {
+      frontTrees.value[i] = frontTrees.value[i] - (level.value + 1)
     }
     blocks.value = blocks.value.filter((x: number) => x >= -20)
     trees.value = trees.value.filter((x: number) => x >= -50)
+    frontTrees.value = frontTrees.value.filter((x: number) => x >= -50)
     if (addBlockDelay.value > 0) {
       addBlockDelay.value = addBlockDelay.value - (1 + level.value/3)
     }
     if (addTreeDelay.value > 0) {
-      addTreeDelay.value = addTreeDelay.value - 1
+      addTreeDelay.value = addTreeDelay.value - (level.value + 1)*2
+    }
+    if (addFrontTreeDelay.value > 0) {
+      addFrontTreeDelay.value = addFrontTreeDelay.value - (level.value + 1)/2
     }
     if (addBlockDelay.value <= 0) {
       if (Math.random() > 0.7) {
@@ -164,7 +174,11 @@ function startGame() {
     }
     if (addTreeDelay.value <= 0) {
       trees.value.push(1100)
-      addTreeDelay.value = 80
+      addTreeDelay.value = Math.random()*60 + 500
+    }
+    if (addFrontTreeDelay.value <= 0) {
+      frontTrees.value.push(1200)
+      addFrontTreeDelay.value = Math.random()*180 + 20
     }
     if (playerPosition.value < 20 && blocks.value[0] > playerLeft && blocks.value[0] <= playerLeft + playerWidth) {
       playerDead.value = true
@@ -239,6 +253,7 @@ function jump() {
       <div class="treeline" />
       <div class="block" v-for="(block, index) in blocks" :key="index" :style="{ left: block + 'px', width: blockWidth + 'px' }"/> 
       <img src="./tree.svg" v-for="tree in trees" :key="tree" class="tree" :style="{ left: tree + 'px'}" />
+      <img src="./tree.svg" v-for="tree in frontTrees" :key="tree" class="front-tree tree" :style="{ left: tree + 'px'}" />
     </div>
   </div>
 </template>
@@ -275,6 +290,10 @@ function jump() {
   bottom: 50px;
   position: absolute;
   width: 50px;
+}
+.front-tree {
+  bottom: 0px;
+  width: 100px;
 }
 .ground {
   height: 5px;
